@@ -9,7 +9,8 @@ var UserSchema = new mongoose.Schema({
   modifiedAt: { type: Date, default: Date.now},
   firstName: String,
   lastName: String,
-  middleName: String
+  middleName: String,
+  photourl: String
 });
 
 const User = mongoose.model('User', UserSchema);

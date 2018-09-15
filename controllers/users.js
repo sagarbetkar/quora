@@ -1,101 +1,120 @@
-const Users = require('../models/users')
+const User = require('../models/users');
 
-exports.getAllUsers = (request, response) => {
-    var query = Users.find();
-    console.log(request.query);
-    query.exec((error, users) => {
-        if (error)
-            response.json({
-                error: error,
-                status: 500
-            });
-        response.json(users)
-    });
+exports.postNewUser = (req, res) => {
+  let {
+    firstName,
+    lastName,
+    email,
+    password,
+    facebook,
+    google,
+    createdAt,
+    modifiedAt
+  } = req.body;
+
+  var user = new User({
+    firstName,
+    lastName,
+    email,
+    password,
+    facebook,
+    google,
+    createdAt,
+    modifiedAt
+  });
+  user.save().then((user) => {
+    console.log('Added successfully');
+    res.json(user);
+  })
 };
 
-exports.postNewUsers = (request, response) => {
-    console.log(request.body);
-    let user = new Users({
-        username: request.body.username,
-        email: request.body.email,
-        password: request.body.password,
-        passwordExpiry: request.body.passwordExpiry,
-        firstName: request.body.firstName,
-        middleName: request.body.middleName,
-        lastName: request.body.lastName,
-        facebook: request.body.facebook,
-        google: request.body.google,
-        token: request.body.token,
-        photo: request.body.token,
-        createdAt: request.body.createdAt,
-        updatedAt: request.body.updatedAt
-    });
-    user.save().then((user) => {
-        console.log('User Added Successfully');
-        response.json(user);
-    });
+exports.getAllUsers = (req, res) => {
+  User.find({}, (error, users) => {
+    if (error) {
+      res.json({
+        message: "Server error, Please try after some time.",
+        status: 500
+      });
+    }
+    if (users) {
+      res.json({
+        data: users,
+        message: "All users fetched",
+        status: 200
+      });
+    } else {
+      res.json({
+        message: "No data found",
+        status: 200
+      });
+    }
+  });
 };
 
-exports.updateUsersById = (request, response) => {
-        const {
-            username,
-            email,
-            password,
-            passwordExpiry,
-            firstName,
-            middleName,
-            lastName,
-            facebook,
-            google,
-            token,
-            photo,
-            createdAt,
-            updatedAt
-        } = request.body;
+exports.getUserById = (req, res) => {
+  User.findById(req.params.id, (err, users) => {
+    if (err) {
+      res.json({
+        message: "Server error, Please try after some time.",
+        status: 500
+      });
+    }
+    if (users) {
+      res.json({
+        data: users,
+        message: "User data fetched successfully",
+        status: 200
+      });
+    } else {
+      res.json({
+        message: "No data found",
+        status: 200
+      });
+    }
+  });
+};
 
-        Users.updateOne({
-                    _id: request.params.id,
-                },
-                {
-                    username,
-                    email,
-                    password,
-                    passwordExpiry,
-                    firstName,
-                    middleName,
-                    lastName,
-                    facebook,
-                    google,
-                    token,
-                    photo,
-                    createdAt,
-                    updatedAt
-                },
+exports.updateUserById = (req, res) => {
+  console.log(req.body);
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    facebook,
+    google
+  } = req.body;
+  User.update({
+    _id: req.params.id
+  }, {
+    firstName,
+    lastName,
+    email,
+    password,
+    facebook,
+    google
+  }, {}, (error, user) => {
+    if (error)
+      res.json({
+        error: error,
+        status: 500
+      });
+    console.log(error);
+    res.json(user);
+  });
+};
 
-                {},
-
-                (error, users) => {
-                    if (error)
-                        response.json({
-                            error: error,
-                            status: 500
-                        });
-                    response.json(Users);
-                });
-    };
-
-    exports.delUsersById = (request, response) => {
-    Users.findOneAndDelete({
-        _id: request.params.id
-    }, (error, deleteId) => {
-        if (error)
-            response.json({
-                error: error,
-                status: 500
-            });
-        response.json({
-            message: "deleted successfully"
-        });
+exports.deleteUserById = (req, res) => {
+  User.findOneAndDelete({
+    _id: req.params.id
+  }, (error, deleteId) => {
+    if (error)
+      res.json({
+        error: error,
+        status: 500
+      });
+    res.json({
+      message: "Deleted successfully"
     });
-
+  });
 };

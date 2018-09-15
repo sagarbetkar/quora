@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
 var answerSchema = new mongoose.Schema({
-	questionId: String,
+	question: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
 	answer: String,
-	createdBy: String,
-	createdAt: Date,
-    updatedAt: Date,
+	user: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+	createdAt: { type: Date, default: Date.now},
+  modifiedAt: { type: Date, default: Date.now}
 })
 
 var Answer = mongoose.model('Answer', answerSchema);
 
-module.exports = Answer ;
+module.exports = Answer;

@@ -1,11 +1,11 @@
 const mongoose = require('mongoose')
 
 var questionSchema = new mongoose.Schema({
-	question: String,
-    createdBy: String,
-	createdAt: Date,
-    updatedAt: Date,
-})
+	ques: String,
+	user: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+	createdAt: { type: Date, default: Date.now},
+  updatedAt: { type: Date, default: Date.now}
+});
 
 const Question = mongoose.model('Question', questionSchema);
 

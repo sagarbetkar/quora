@@ -4,60 +4,90 @@ exports.getAllQuestions = (request, response) => {
     var query = Questions.find()
     console.log(request.query)
     query.exec((error, questions) => {
-        if (error)
-            response.json({
-                error: error,
-                status: 500
-            })
-        response.json(questions)
-    })
-}
+        if (error) {
+          response.json({
+              error: error,
+              status: 500
+          });
+        }
+        if (questions) {
+          response.json ({
+            data: questions,
+            message: "All questions fetched",
+            status: 200
+          });
+        } else {
+          response.json({
+            message: "No data found",
+            status: 200
+          });
+        }
+    });
+};
 
-exports.postNewQuestions = (request, response) => {
-    console.log(request.body)
-    let question = new Questions({
-        question: request.body.question,
-        createdBy: request.body.createdBy,
-        createdOn: request.body.createdOn,
-        createdAt: request.body.createdAt
-    })
+exports.postNewQuestion = (request, response) => {
+    let {
+      ques,
+    	user,
+    	createdAt,
+      updatedAt
+    } = request.body;
+
+    var question = new Question({
+      ques,
+    	user,
+    	createdAt,
+      updatedAt
+    });
     question.save().then((question) => {
-        console.log('Question Added')
-        response.json(question)
-    })
-}
+        console.log('Question Added');
+        response.json({
+          message: "Added successfully",
+          status: 200
+        });
+    }).catch(function (err) {
+      if (err) {
+        console.log(err);
+        response.json({
+          message: 'Server error',
+          status: 500
+        });
+      }
+    });
+};
 
 exports.updateQuestionById = (request, response) => {
-    Questions.updateOne({
-            _id: request.params.id,
-        }, {
-            question: request.body.question,
-            createdBy: request.body.createdBy,
-            createdOn: request.body.createdOn,
-            createdAt: request.body.createdAt
-        }, {},
+  const {
+    ques,
+    user
+  } = request.body;
+  Question.update({
+    _id: request.params.id
+  }, {
+    ques,
+    user
+  }, {}, (error, question) => {
+    if (error)
+      response.json({
+        error: error,
+        status: 500
+      });
+    console.log(error);
+    response.json(question);
+  });
+};
 
-        (error, question) => {
-            if (error)
-                response.json({
-                    error: error,
-                    status: 500
-                })
-            response.json(question)
-        })
-}
-
-exports.delQuestionById = (request,response) => {
-	Questions.findOneAndDelete({
-		_id: request.params.id
-	}, (error, delQuestion) => {
-		if (error)
-            response.json({
-                error: error,
-                status: 500
-            })
-        response.json({
-            message: "deleted successfully"
-        })
-	})
-   }
+exports.deleteQuestionById = (request, response) => {
+  Questions.findOneAndDelete({
+    _id: request.params.id
+  }, (error, deleteQuestion) => {
+    if (error)
+      response.json({
+        error: error,
+        status: 500
+      });
+    response.json({
+      message: "deleted successfully"
+    });
+  });
+};

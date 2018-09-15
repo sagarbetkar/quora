@@ -1,86 +1,127 @@
-const Blog = require('../models/blog')
+const Blog = require('../models/blog');
 
-exports.getAllBlogs = (request, response) => {
-    var query = Blog.find()
-    console.log(request.query)
-    query.exec((error, blogs) => {
-        if (error)
-            response.json({
-                error: error,
-                status: 500
-            })
-        response.json(blogs)
-    })
-}
+exports.postNewBlog = (req, res) => {
+  let {
+    title,
+    userId,
+    author,
+    description,
+    createdAt,
+    updatedAt,
+    topic
+  } = req.body;
 
-exports.postNewBlogs = (request, response) => {
-    console.log(request.body)
-    let blog = new Blog({
-        title: request.body.title,
-        userId: request.body.userId,
-        author: request.body.author,
-        description: request.body.description,
-        createdAt: request.body.createdAt,
-        updatedAt: request.body.updatedAt,
-        topic: request.body.topic
-    })
-    blog.save().then((blog) => {
-        console.log('Blog Added Successfully')
-        response.json(blog)
-    })
-}
+  var blog = new Blog({
+    title,
+    userId,
+    author,
+    description,
+    createdAt,
+    updatedAt,
+    topic
+  });
+  blog.save().then((blog) => {
+    console.log('Added successfully');
+    res.json({
+      message: "Added successfully",
+      status: 200
+    });
+  }).catch(function(err) {
+    if (err) {
+      console.log(err);
+      res.json({
+        message: 'Server error',
+        status: 500
+      });
+    }
+  });
+};
 
-exports.updateBlogsById = (request, response) => {
-    const {
+exports.getAllBlogs = (req, res) => {
+  Blog.find({}, (error, blogs) => {
+    if (error) {
+      res.json({
+        message: "Server error, Please try after some time.",
+        status: 500
+      });
+    }
+    if (blogs) {
+      res.json({
+        data: blogs,
+        message: "All blogs fetched",
+        status: 200
+      });
+    } else {
+      res.json({
+        message: "No data found",
+        status: 200
+      });
+    }
+  });
+};
 
+exports.getBlogById = (req, res) => {
+  Blog.findById(req.params.id, (err, blogs) => {
+    if (err) {
+      res.json({
+        message: "Server error, Please try after some time.",
+        status: 500
+      });
+    }
+    if (blogs) {
+      res.json({
+        data: blogs,
+        message: "Blog data fetched successfully",
+        status: 200
+      });
+    } else {
+      res.json({
+        message: "No data found",
+        status: 200
+      });
+    }
+  });
+};
 
-        title,
-        userId,
-        author,
-        description,
-        createdAt,
-        updatedAt,
-        topic
+exports.updateBlogById = (req, res) => {
+  console.log(req.body);
+  const {
+    title,
+    userId,
+    author,
+    description,
+    topic
+  } = req.body;
+  Blog.update({
+    _id: req.params.id
+  }, {
+    title,
+    userId,
+    author,
+    description,
+    topic
+  }, {}, (error, blog) => {
+    if (error)
+      res.json({
+        error: error,
+        status: 500
+      });
+    console.log(error);
+    res.json(blog);
+  });
+};
 
-    } = request.body
-
-    Blog.updateOne({
-            _id: request.params.id,
-        }, {
-
-             title,
-        userId,
-        author,
-        description,
-        createdAt,
-        updatedAt,
-        topic
-        },
-
-        {},
-
-        (error, space) => {
-            if (error)
-                response.json({
-                    error: error,
-                    status: 500
-                })
-            response.json(Blog)
-        })
-}
-
-exports.delBlogsById = (request, response) => {
-    Blog.findOneAndDelete({
-        _id: request.params.id
-    }, (error, deleteId) => {
-        if (error)
-            response.json({
-                error: error,
-                status: 500
-            })
-        response.json({
-            message: "deleted successfully"
-        })
-    })
-
-}
+exports.deleteBlogById = (req, res) => {
+  Blog.findOneAndDelete({
+    _id: req.params.id
+  }, (error, deleteId) => {
+    if (error)
+      res.json({
+        error: error,
+        status: 500
+      });
+    res.json({
+      message: "Deleted successfully"
+    });
+  });
+};
