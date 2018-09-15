@@ -1,19 +1,15 @@
 const mongoose = require('mongoose')
 
 var UserSchema = new mongoose.Schema({
-    username:	String,
-    email: String,
-    password: String,
-    passwordExpiry: Date,
-    firstName: String,
-    middleName: String,
-    lastName: String,
-    facebook: String,
-    google: String,
-    token: Array,
-    photo: String,
-    createdAt: Date,
-    updatedAt: Date,
+  username: String,
+  email: { type : String, required: true, unique: true},
+  password: String,
+  passwordExpiry: String,
+  createdAt: { type: Date, default: Date.now},
+  modifiedAt: { type: Date, default: Date.now},
+  firstName: String,
+  lastName: String,
+  middleName: String
 });
 
 const User = mongoose.model('User', UserSchema);
